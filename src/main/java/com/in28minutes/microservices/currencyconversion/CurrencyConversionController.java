@@ -3,10 +3,14 @@ package com.in28minutes.microservices.currencyconversion;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Formatter.BigDecimalLayoutForm;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 public class CurrencyConversionController {
@@ -14,7 +18,14 @@ public class CurrencyConversionController {
 	@GetMapping("/currency-converter/from/{from}/to/{to}/quantity/{quantity}")
 	public CurrencyConversion convertCurrency(@PathVariable String from, 
 			@PathVariable String to, @PathVariable BigDecimal quantity) {
-		BigDecimal test2 = new BigDecimal("3").pow(1000);
-		return new CurrencyConversion(1L, from, to, test2, quantity, quantity, 0);
+		
+		Map<String, String> uriVariables = new HashMap<>();
+		uriVariables.put("from", from);
+		uriVariables.put("to", to);
+		ResponseEntity<CurrencyConversion> responseEntity = new RestTemplate().getForEntity("http://localhost:8000/currency-exchange/from/{from}/to/{to}", CurrencyConversion.class, uriVariables);
+		
+		CurrencyConversion response = responseEntity.getBody();
+		
+		return new CurrencyConversion(response.getId(), from, to, response.getConversionMultiple(), quantity, quantity.multiply(response.getConversionMultiple()), response.getPort());
 	}
 }
