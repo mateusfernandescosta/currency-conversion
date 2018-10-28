@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RibbonClient(name="currency-exchange-service")
-@FeignClient(name="currency-exchange-service")
+@FeignClient(name="gateway-server/currency-exchange-service")
 public interface CurrencyExchangeServiceProxy {
 
 	@GetMapping("/currency-exchange/from/{from}/to/{to}")
